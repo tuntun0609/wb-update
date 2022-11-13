@@ -1,45 +1,32 @@
+const path = require('path');
 const axios = require('axios');
-const qs = require('qs');
-const fs = require('fs');
-const getCookie = require('./getCookie');
+const cheerio = require('cheerio');
+const HttpsProxyAgent = require("https-proxy-agent");
 
-const updateBaseUrl = 'https://weibo.com/ajax/statuses/update';
+const httpsAgent = new HttpsProxyAgent(`http://127.0.0.1:7890`);
 
-const updateWb = async (content) => {
-	if (fs.existsSync('cookie.txt')) {
-		const cookieData = fs.readFileSync('cookie.txt').toString();
-		const data = await axios.post(
-			updateBaseUrl,
-			qs.stringify({
-				content: content,
-				pic_id: '',
-				pic_id: '',
-				visible: 0,
-				share_id: '',
-				media: '{}',
-				vote: '{}',
-				approval_state: 0,
-			}),
-			{
-				headers: {
-					authority: 'weibo.com',
-					'content-type': 'application/x-www-form-urlencoded',
-					cookie: cookieData,
-					traceparent: '00-5175e2baf74db2f4fa4da2a9061eba74-948675b0f17aa309-00',
-					'x-requested-with': 'XMLHttpRequest',
-					'x-xsrf-token': getCookie(cookieData, 'XSRF-TOKEN'),
-				}
-			}
-		);
-		return data.data;
-	} else {
-		return 'cookie.txt not exist, please create cookie.txt';
+const getGithubContribution = async (name) => {
+	try {
+		const data = await axios.get(`https://github.com/${name}?from=2022-11-13&to=2022-11-13&tab=overview`, {
+			proxy: false,
+			httpsAgent,
+		});
+		const $ = cheerio.load(data.data);
+		// const timelineItems = $('.contribution-activity-listing div').find('.TimelineItem');
+		// console.log($('.contribution-activity-listing div').find('.TimelineItem'));
+		// Object.keys(timelineItems).forEach((key) => {
+		// 	console.log(timelineItems[key]);
+		// });
+	} catch (error) {
+		console.error('getGithubContribution error', error);
 	}
 }
 
 const init = async () => {
-	const data = await updateWb('test');
-	console.log(data?.msg ? data.msg : data);
+	// const data = await updateWb('test');
+	// console.log(data?.msg ? data.msg : data);
+
+	await getGithubContribution('tuntun0609');
 }
 
 init();
