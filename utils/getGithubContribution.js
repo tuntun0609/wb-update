@@ -20,6 +20,9 @@ const getGithubContribution = async (name, time) => {
 	timelineItems.each(function (i, el) {
 		res.push(textToOneLine($(this).text()));
 	});
+	if (res.length === 1) {
+		res.push(`${name} had no activity during this period.`)
+	}
 	return res.join('\n');
 }
 
