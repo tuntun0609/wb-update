@@ -6,7 +6,7 @@ const getCookie = require('./getCookie');
 
 const updateBaseUrl = 'https://weibo.com/ajax/statuses/update';
 
-const updateWb = async (content, cookiePath) => {
+const updateWb = async (content, cookiePath = './cookie.txt') => {
 	const cp = path.resolve(process.cwd(), cookiePath)
 	if (fs.existsSync(cp)) {
 		const cookieData = fs.readFileSync(cp).toString();
